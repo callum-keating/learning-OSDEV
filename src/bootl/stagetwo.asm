@@ -8,6 +8,10 @@ two_start:
     mov sp, 0x7C00
 
     mov si, message
+    call .print_loop
+    mov si, loadFAT_msg 
+    call .print_loop
+    jmp $
 
 .print_loop:
     lodsb
@@ -18,8 +22,13 @@ two_start:
     mov bl, 7
     int 0x10
     jmp .print_loop
-.done:
-    jmp $
 
-message: db 0x0A, 0x0D, "Stage 2 loaded successfully!", 0
+;getKernel:
+;    pass 
+
+.done:
+    ret
+
+message: db 0x0A, 0x0D, "Stage 2 loaded successfully", 0 ; move down a line and move to the beginning
+loadFAT_msg: db 0x0A, 0x0D, "now attempting to read fat filesystem starting at sector 11...", 0
 times 5120 - ($ - $$) db 0
