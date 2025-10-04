@@ -38,7 +38,7 @@ entry:
     mov ds, ax
     mov ss, ax
     mov sp, 0x7c00
-    jmp 0x0200:0x0000
+    jmp 0x0000:0x2000
 
 print:
     lodsb           ; AL = [SI], SI++
