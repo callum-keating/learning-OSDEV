@@ -17,15 +17,10 @@ entry:
     mov si, message
     call print
     ; load stage 2
-    ; Setup stack
-    xor ax, ax
-    mov ss, ax
-    mov sp, 0x7C00
-
     mov ch, 0
     mov cl, 2
     mov dh, 0
-    mov bx, 0x2000
+    mov bx, 0x7E00
     xor ax, ax
     mov es, ax
     mov ax, 0x0000
@@ -34,11 +29,7 @@ entry:
     int 13h         ; call interupt to load stage 2
     jc disk_error
 
-    mov ax, 0x0200
-    mov ds, ax
-    mov ss, ax
-    mov sp, 0x7c00
-    jmp 0x0000:0x2000
+    jmp 0x0000:0x7E00
 
 print:
     lodsb           ; AL = [SI], SI++
