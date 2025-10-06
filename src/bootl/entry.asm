@@ -29,6 +29,10 @@ entry:
     int 13h         ; call interupt to load stage 2
     jc disk_error
 
+    mov si, 0x7C00 + 446
+    mov di, 0x0500
+    mov cx, 64
+    rep movsb 
     jmp 0x0000:0x7E00
 
 print:
