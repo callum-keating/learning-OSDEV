@@ -13,6 +13,7 @@ entry:
     mov  ss, ax
     mov  sp, 0x7C00
     cli               ; Clear interrupts
+    mov [bootDisk], dl
     ; Entry for CDOS
     mov si, message
     call print
@@ -26,6 +27,7 @@ entry:
     mov ax, 0x0000
     mov ah, 0x02    ; read sectors from disk instruction
     mov al, 10
+    mov dl, [bootDisk]
     int 13h         ; call interupt to load stage 2
     jc disk_error
 
@@ -63,6 +65,7 @@ disk_error:
 
 message: db "Loading second stage", 0
 disk_error_message: db "ERROR OCCURRED LOADING SECOND STAGE OF BOOTLOADER", 0
+bootDisk: db 0
 
 times 446 - ($ - $$) db 0       ; pad to 446 (start of partition table)
 times 64 db 0                   ; reserve space for partition table

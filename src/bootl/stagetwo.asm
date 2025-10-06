@@ -20,6 +20,7 @@ print:
 read_fail:
     mov si, readPartitionSectorFailMsg
     call print
+    jmp $
 
 stageTwo:
     ; setup registers
@@ -31,10 +32,12 @@ stageTwo:
     mov sp, 0x7C00
     sti
 
+    mov [bootDisk], dl
     mov si, loadFATMsg
     call print
     ; load first sector that was stored in memory in stage one into the si register
     mov si, 0x0500
+    mov dl, [bootDisk]
     call findFAT
 
 
@@ -46,7 +49,7 @@ findFAT:
     sub si, 4
     add si, 16
     cmp si, 0x0540
-    je .failiure
+    jge .failure
     jne findFAT
 
 .success:
@@ -54,7 +57,7 @@ findFAT:
     mov si, foundFATMsg
     call print
     pop si
-    add si, 8               ; Get to LBA address of start sector
+    add si, 4               ; Get to LBA address of start sector
 
     mov ax, [si]            ; mov the first 2 bytes of the LBA to ax
     mov [dap + 8], ax       ; mov ax to dap + 8 (First 2 bytes) 
@@ -79,10 +82,11 @@ findFAT:
     mov si, dap             ; disk address packet to use
     int 0x13
     jc read_fail
-
+    mov si, buffer + 0x10
+    call print
 
     ret
-.failiure:
+.failure:
     mov si, notFoundFATMsg
     call print
     jmp $
@@ -92,6 +96,7 @@ foundFATMsg:                db newline, "Found FAT filesystem", newline, "now se
 notFoundFATMsg:             db newline, "FAILED TO FIND FAT FILESYSTEM PARTITION THE PARTITION TABLE MAY BE CORRUPTED", 0
 readingFATMsg:              db newline, "Finding required entrys in bpb", 0
 readPartitionSectorFailMsg: db newline, "Failed calling BIOS interupt to read FAT filesystem", 0
+bootDisk:                   db 0
 dap:
     db 0x10                 ; DAP is 16 bytes long
     db 0x00                 ; Reserved
